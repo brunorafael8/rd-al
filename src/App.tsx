@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bar, BarChart, XAxis, ResponsiveContainer } from "recharts";
 import { Button } from "@/components/ui/button";
+import { supabase } from "./supabaseClient";
 import {
   Card,
   CardContent,
@@ -29,7 +30,7 @@ import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 
 const data = [
   {
-    name: '1000',
+    name: "1000",
     revenue: 10400,
     subscription: 240,
   },
@@ -124,9 +125,9 @@ const CITIES = [
   "Monteirópolis",
   "Murici",
   "Novo Lino",
-  "Olho d'Água das Flores",
-  "Olho d'Água do Casado",
-  "Olho d'Água Grande",
+  "Olho d Água das Flores",
+  "Olho d Água do Casado",
+  "Olho d Água Grande",
   "Olivença",
   "Ouro Branco",
   "Palestina",
@@ -171,20 +172,54 @@ const CITIES = [
 function App() {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
+  const [name, setName] = useState("");
+
+  const getCities = async () => {
+    const { data, error } = await supabase.from("User").select("city");
+    if (error) {
+      alert(error.message);
+    }
+    console.log(data);
+  
+  }
+
+  useEffect(() => {
+    getCities()
+  }, []);
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log("Form Submitted", name, value);
+    const data = {
+      name,
+      city: value,
+    };
+    
+    const { error } = await supabase.from("User").upsert(data);
+
+    if (error) {
+      alert(error.message);
+    }
+  };
 
   return (
     <div className="h-screen bg-black flex justify-center items-center gap-8">
-      <Card className="w-[350px]">
-        <CardHeader>
-          <CardTitle>Censo RD AL</CardTitle>
-          <CardDescription>De onde você é ?</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form>
+      <form onSubmit={onSubmit}>
+        <Card className="w-[350px]">
+          <CardHeader>
+            <CardTitle>Censo RD AL</CardTitle>
+            <CardDescription>De onde você é ?</CardDescription>
+          </CardHeader>
+          <CardContent>
             <div className="grid w-full items-center gap-4">
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Nome</Label>
-                <Input id="name" placeholder="Seu Nome" />
+                <Input
+                  id="name"
+                  placeholder="Seu Nome"
+                  required
+                  onChange={(e) => setName(e.target.value)}
+                />
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Sua Cidade:</Label>
@@ -207,6 +242,7 @@ function App() {
                       <CommandInput
                         placeholder="Search framework..."
                         className="h-9 w-[250px]"
+                        required
                       />
                       <CommandList>
                         <CommandEmpty>No framework found.</CommandEmpty>
@@ -238,12 +274,13 @@ function App() {
                 </Popover>
               </div>
             </div>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-end">
-          <Button>Enviar</Button>
-        </CardFooter>
-      </Card>
+          </CardContent>
+          <CardFooter className="flex justify-end">
+            <Button type="submit">Enviar</Button>
+          </CardFooter>
+        </Card>
+      </form>
+
       <Card className="w-[350px]">
         <CardHeader>
           <CardTitle>Resultado:</CardTitle>
@@ -252,7 +289,7 @@ function App() {
           <div className="h-[80px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data}>
-              <XAxis dataKey="name" />
+                <XAxis dataKey="name" />
                 <Bar
                   dataKey="subscription"
                   style={
