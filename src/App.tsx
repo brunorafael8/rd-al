@@ -158,8 +158,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [openStatus, setOpenStatus] = useState(false);
+  const [openSubStatus, setOpenSubStatus] = useState(false);
   const [value, setValue] = useState("");
   const [status, setStatus] = useState("");
+  const [subStatus, setSubStatus] = useState("");
   const [name, setName] = useState("");
   const [cities, setCities] = useState<[] | any>([]);
   const [usersStatus, setUsersStatus] = useState<[] | any>([]);
@@ -186,6 +188,7 @@ function App() {
       name,
       city: value,
       status,
+      subStatus
     };
 
     if(name.length < 2) {
@@ -337,6 +340,58 @@ function App() {
                   </PopoverContent>
                 </Popover>
               </div>
+              {status === "Solteiro" &&<div className="flex flex-col space-y-1.5">
+                <Label htmlFor="name">Qual o nível de Solteiro?:</Label>
+                <Popover open={openSubStatus} onOpenChange={setOpenSubStatus}>
+                  <PopoverTrigger asChild className="w-full">
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openSubStatus}
+                      className="w-[300px] justify-between"
+                    >
+                      {subStatus
+                        ? ['Emocionado', 'Humilhado', 'Encalhado', 'Pra titia', 'Desiludido', 'Oi, vi que você apagou as fotos com o seu EX tá tudo bem?', 'Só solteiro mesmo'].find((i) => i === subStatus)
+                        : "Selecione o seu nível de Solteiro..."}
+                      <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput
+                        placeholder="Qual o nível de Solteiro..."
+                        className="h-9 w-[250px]"
+                        required
+                      />
+                      <CommandList>
+                        <CommandEmpty>.</CommandEmpty>
+                        <CommandGroup>
+                          {['Emocionado', 'Humilhado', 'Encalhado', 'Pra titia', 'Desiludido', 'Oi, vi que você apagou as fotos com o seu EX tá tudo bem?', 'Só solteiro mesmo'].map((i) => (
+                            <CommandItem
+                              key={i}
+                              value={i}
+                              onSelect={(currentValue) => {
+                                setSubStatus(
+                                  currentValue === subStatus ? "" : currentValue
+                                );
+                                setOpenSubStatus(false);
+                              }}
+                            >
+                              {i}
+                              <CheckIcon
+                                className={cn(
+                                  "ml-auto h-4 w-4",
+                                  status === i ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>}
             </div>
           </CardContent>
           <CardFooter className="flex justify-end">
