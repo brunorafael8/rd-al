@@ -351,7 +351,7 @@ function App() {
                       className="w-[300px] justify-between"
                     >
                       {subStatus
-                        ? ['Emocionado', 'Humilhado', 'Encalhado', 'Pra titia', 'Desiludido', 'Oi, vi que você apagou as fotos com o seu EX tá tudo bem?', 'Só solteiro mesmo'].find((i) => i === subStatus)
+                        ? ['Emocionado', 'Humilhado', 'Encalhado', 'Pra titia', 'Desiludido', 'Oi, vi que você apagou as fotos com o seu EX tá tudo bem?', 'Só solteiro mesmo', 'Golpe'].find((i) => i === subStatus)
                         : "Selecione o seu nível de Solteiro..."}
                       <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -366,7 +366,7 @@ function App() {
                       <CommandList>
                         <CommandEmpty>.</CommandEmpty>
                         <CommandGroup>
-                          {['Emocionado', 'Humilhado', 'Encalhado', 'Pra titia', 'Desiludido', 'Oi, vi que você apagou as fotos com o seu EX tá tudo bem?', 'Só solteiro mesmo'].map((i) => (
+                          {['Emocionado', 'Humilhado', 'Encalhado', 'Pra titia', 'Desiludido', 'Oi, vi que você apagou as fotos com o seu EX tá tudo bem?', 'Só solteiro mesmo', 'Golpe'].map((i) => (
                             <CommandItem
                               key={i}
                               value={i}
