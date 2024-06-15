@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Analytics } from "@vercel/analytics/react"
 import {
   Table,
   TableBody,
@@ -208,6 +209,7 @@ function App() {
 
   return (
     <div className="lg:h-screen bg-black flex justify-center items-center gap-8 flex-col p-[24px]">
+      <Analytics />
       <form onSubmit={onSubmit} className="lg:w-[716px] w-full">
         <Card className="lg:w-[716px] w-full">
           <CardHeader>
