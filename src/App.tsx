@@ -188,6 +188,10 @@ function App() {
       status,
     };
 
+    if(name.length < 2) {
+      return alert("Nome precisa ter mais de 2 caracteres");
+    }
+
     if (value === "") {
       return alert("Selecione uma cidade");
     }
@@ -224,6 +228,7 @@ function App() {
                   id="name"
                   placeholder="Seu Nome"
                   value={name}
+                  min={2}
                   required
                   onChange={(e) => setName(e.target.value)}
                 />
