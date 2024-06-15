@@ -159,15 +159,15 @@ function App() {
   const [value, setValue] = useState("");
   const [status, setStatus] = useState("");
   const [name, setName] = useState("");
-  const [cities, setCities] = useState([]);
-  const [usersStatus, setUsersStatus] = useState([]);
+  const [cities, setCities] = useState<[] | any>([]);
+  const [usersStatus, setUsersStatus] = useState<[] | any>([]);
 
   const getCities = async () => {
     const { data, error } = await supabase.from("user_city").select("");
     const statusData = await supabase.from("user_status").select("");
 
  
-    if (error && statusData.error) {
+    if (error && statusData.error && !data && !statusData.data) {
       return alert(error.message);
     }
 
