@@ -154,6 +154,7 @@ const STATUS_ITEMS = [
 ];
 
 function App() {
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [openStatus, setOpenStatus] = useState(false);
   const [value, setValue] = useState("");
@@ -166,14 +167,12 @@ function App() {
     const { data, error } = await supabase.from("user_city").select("");
     const statusData = await supabase.from("user_status").select("");
 
- 
     if (error && statusData.error && !data && !statusData.data) {
       return alert(error.message);
     }
 
     setCities(data);
     setUsersStatus(statusData.data);
-    console.log(data);
   };
 
   useEffect(() => {
@@ -188,15 +187,23 @@ function App() {
       status,
     };
 
-    if(value === "" ){
-      return  alert("Selecione uma cidade");
+    if (value === "") {
+      return alert("Selecione uma cidade");
     }
-    
+    setLoading(true);
+
     const { error } = await supabase.from("user").upsert(data);
 
     if (error) {
-      alert(error.message);
+      return alert(error.message);
     }
+
+    await getCities();
+    setName("");
+    setValue("");
+    setStatus("");
+    setLoading(false);
+    alert("Cadastrado com sucesso");
   };
 
   return (
@@ -214,6 +221,7 @@ function App() {
                 <Input
                   id="name"
                   placeholder="Seu Nome"
+                  value={name}
                   required
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -325,7 +333,7 @@ function App() {
             </div>
           </CardContent>
           <CardFooter className="flex justify-end">
-            <Button type="submit">Enviar</Button>
+            <Button disabled={loading} type="submit">{loading ? 'loading...' : 'Enviar'}</Button>
           </CardFooter>
         </Card>
       </form>
