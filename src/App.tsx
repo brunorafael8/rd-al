@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { Bar, BarChart, XAxis, ResponsiveContainer } from "recharts";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { supabase } from "./supabaseClient";
 import {
@@ -27,42 +35,6 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
-
-const data = [
-  {
-    name: "1000",
-    revenue: 10400,
-    subscription: 240,
-  },
-  {
-    revenue: 14405,
-    subscription: 300,
-  },
-  {
-    revenue: 9400,
-    subscription: 200,
-  },
-  {
-    revenue: 8200,
-    subscription: 278,
-  },
-  {
-    revenue: 7000,
-    subscription: 189,
-  },
-  {
-    revenue: 9600,
-    subscription: 239,
-  },
-  {
-    revenue: 11244,
-    subscription: 278,
-  },
-  {
-    revenue: 26475,
-    subscription: 189,
-  },
-];
 
 const CITIES = [
   "Água Branca",
@@ -169,33 +141,58 @@ const CITIES = [
   "Viçosa",
 ];
 
+const STATUS_ITEMS = [
+  "Fiel a Ficante",
+  "Solteiro",
+  "Casado",
+  "Divorciado",
+  "Namorando",
+  "Separado",
+  "União Estável",
+  "Nunca namorei, mas observo...",
+  "Último romântico",
+];
+
 function App() {
   const [open, setOpen] = useState(false);
+  const [openStatus, setOpenStatus] = useState(false);
   const [value, setValue] = useState("");
+  const [status, setStatus] = useState("");
   const [name, setName] = useState("");
+  const [cities, setCities] = useState([]);
+  const [usersStatus, setUsersStatus] = useState([]);
 
   const getCities = async () => {
-    const { data, error } = await supabase.from("User").select("city");
-    if (error) {
-      alert(error.message);
+    const { data, error } = await supabase.from("user_city").select("");
+    const statusData = await supabase.from("user_status").select("");
+
+ 
+    if (error && statusData.error) {
+      return alert(error.message);
     }
+
+    setCities(data);
+    setUsersStatus(statusData.data);
     console.log(data);
-  
-  }
+  };
 
   useEffect(() => {
-    getCities()
+    getCities();
   }, []);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form Submitted", name, value);
     const data = {
       name,
       city: value,
+      status,
     };
+
+    if(value === "" ){
+      return  alert("Selecione uma cidade");
+    }
     
-    const { error } = await supabase.from("User").upsert(data);
+    const { error } = await supabase.from("user").upsert(data);
 
     if (error) {
       alert(error.message);
@@ -203,16 +200,16 @@ function App() {
   };
 
   return (
-    <div className="h-screen bg-black flex justify-center items-center gap-8">
-      <form onSubmit={onSubmit}>
-        <Card className="w-[350px]">
+    <div className="lg:h-screen bg-black flex justify-center items-center gap-8 flex-col p-[24px]">
+      <form onSubmit={onSubmit} className="lg:w-[716px] w-full">
+        <Card className="lg:w-[716px] w-full">
           <CardHeader>
-            <CardTitle>Censo RD AL</CardTitle>
+            <CardTitle>Censo RD AL 🎈</CardTitle>
             <CardDescription>De onde você é ?</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid w-full items-center gap-4">
-              <div className="flex flex-col space-y-1.5">
+              <div className="flex flex-col space-y-1.5 w-[300px]">
                 <Label htmlFor="name">Nome</Label>
                 <Input
                   id="name"
@@ -273,6 +270,58 @@ function App() {
                   </PopoverContent>
                 </Popover>
               </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="name">Estado Cívil:</Label>
+                <Popover open={openStatus} onOpenChange={setOpenStatus}>
+                  <PopoverTrigger asChild className="w-full">
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openStatus}
+                      className="w-[300px] justify-between"
+                    >
+                      {status
+                        ? STATUS_ITEMS.find((i) => i === status)
+                        : "Selecione o seu Estado Cívil..."}
+                      <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput
+                        placeholder="Qual o seu St..."
+                        className="h-9 w-[250px]"
+                        required
+                      />
+                      <CommandList>
+                        <CommandEmpty>No framework found.</CommandEmpty>
+                        <CommandGroup>
+                          {STATUS_ITEMS.map((i) => (
+                            <CommandItem
+                              key={i}
+                              value={i}
+                              onSelect={(currentValue) => {
+                                setStatus(
+                                  currentValue === status ? "" : currentValue
+                                );
+                                setOpenStatus(false);
+                              }}
+                            >
+                              {i}
+                              <CheckIcon
+                                className={cn(
+                                  "ml-auto h-4 w-4",
+                                  status === i ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </CardContent>
           <CardFooter className="flex justify-end">
@@ -280,30 +329,56 @@ function App() {
           </CardFooter>
         </Card>
       </form>
-
-      <Card className="w-[350px]">
-        <CardHeader>
-          <CardTitle>Resultado:</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[80px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data}>
-                <XAxis dataKey="name" />
-                <Bar
-                  dataKey="subscription"
-                  style={
-                    {
-                      fill: "#000",
-                      opacity: 1,
-                    } as React.CSSProperties
-                  }
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex flex-row gap-4">
+        <Card className="lg:w-[350px] w-full">
+          <CardHeader>
+            <CardTitle>Cidades 🎈</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableCaption>Dados baseados nos cadastros</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[150px]">Cidade</TableHead>
+                  <TableHead>Rds na cidade</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {cities.map((item: any) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-bold">{item.city}</TableCell>
+                    <TableCell>{item.total}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+        <Card className="lg:w-[350px] w-full">
+          <CardHeader>
+            <CardTitle>Estado Cívil 🎈</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableCaption>Dados baseados nos cadastros</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[150px]">Status</TableHead>
+                  <TableHead>Quantidade</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {usersStatus.map((item: any) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-bold">{item.status}</TableCell>
+                    <TableCell>{item.total}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
