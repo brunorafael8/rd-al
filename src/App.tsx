@@ -136,7 +136,7 @@ function App() {
     <div className="lg:h-screen bg-black flex justify-center items-center gap-8 flex-col lg:flex-row p-[24px]">
       <Analytics />
       <form onSubmit={onSubmit} className="lg:w-[716px] w-full">
-        <Card className="lg:w-[716px] w-full h-[740px]">
+        <Card className="lg:w-[716px] w-full h-[740px] relative">
           <CardHeader>
             <CardTitle>Censo RD AL 🎈</CardTitle>
             <CardDescription>IBGE DO RD ?</CardDescription>
@@ -476,7 +476,7 @@ function App() {
               </div>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-end">
+          <CardFooter className="flex justify-end bottom-0 right-0 absolute">
             <Button disabled={loading} type="submit">
               {loading ? "loading..." : "Enviar"}
             </Button>
