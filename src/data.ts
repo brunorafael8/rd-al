@@ -352,6 +352,16 @@ export const JOBS = [
   "Web Designer",
   "Zelador",
   "Zootecnista",
+  "Servidor Público",
+  "Estudante",
+  "Desempregado",
+  "Empreendedor",
+  "Autônomo",
+  "Aposentado",
+  "Estagiário",
+  "Trainee",
+  "Freelancer",
+  "Coach",
 ]
 
 export const HOBBIES = [
