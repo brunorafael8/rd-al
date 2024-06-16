@@ -136,7 +136,7 @@ function App() {
     <div className="lg:h-screen bg-black flex justify-center items-center gap-8 flex-col lg:flex-row p-[24px]">
       <Analytics />
       <form onSubmit={onSubmit} className="lg:w-[716px] w-full">
-        <Card className="lg:w-[716px] w-full h-[683px]">
+        <Card className="lg:w-[716px] w-full h-[740px]">
           <CardHeader>
             <CardTitle>Censo RD AL 🎈</CardTitle>
             <CardDescription>IBGE DO RD ?</CardDescription>
