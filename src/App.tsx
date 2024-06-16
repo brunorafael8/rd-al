@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
 import {
   Table,
   TableBody,
@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 import { supabase } from "./supabaseClient";
 import {
   Card,
@@ -36,135 +37,32 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
-
-const CITIES = [
-  "Água Branca",
-  "Anadia",
-  "Arapiraca",
-  "Atalaia",
-  "Barra de Santo Antônio",
-  "Barra de São Miguel",
-  "Batalha",
-  "Belém",
-  "Belo Monte",
-  "Boca da Mata",
-  "Branquinha",
-  "Cacimbinhas",
-  "Cajueiro",
-  "Campestre",
-  "Campo Alegre",
-  "Campo Grande",
-  "Canapi",
-  "Capela",
-  "Carneiros",
-  "Chã Preta",
-  "Coité do Nóia",
-  "Colônia Leopoldina",
-  "Coqueiro Seco",
-  "Coruripe",
-  "Craíbas",
-  "Delmiro Gouveia",
-  "Dois Riachos",
-  "Estrela de Alagoas",
-  "Feira Grande",
-  "Feliz Deserto",
-  "Flexeiras",
-  "Girau do Ponciano",
-  "Ibateguara",
-  "Igaci",
-  "Igreja Nova",
-  "Inhapi",
-  "Jacaré dos Homens",
-  "Jacuípe",
-  "Japaratinga",
-  "Jaramataia",
-  "Jequiá da Praia",
-  "Joaquim Gomes",
-  "Jundiá",
-  "Junqueiro",
-  "Lagoa da Canoa",
-  "Limoeiro de Anadia",
-  "Maceió",
-  "Major Isidoro",
-  "Mar Vermelho",
-  "Maragogi",
-  "Maravilha",
-  "Marechal Deodoro",
-  "Maribondo",
-  "Mata Grande",
-  "Matriz de Camaragibe",
-  "Messias",
-  "Minador do Negrão",
-  "Monteirópolis",
-  "Murici",
-  "Novo Lino",
-  "Olho d Água das Flores",
-  "Olho d Água do Casado",
-  "Olho d Água Grande",
-  "Olivença",
-  "Ouro Branco",
-  "Palestina",
-  "Palmeira dos Índios",
-  "Pão de Açúcar",
-  "Pariconha",
-  "Paripueira",
-  "Passo de Camaragibe",
-  "Paulo Jacinto",
-  "Penedo",
-  "Piaçabuçu",
-  "Pilar",
-  "Pindoba",
-  "Piranhas",
-  "Poço das Trincheiras",
-  "Porto Calvo",
-  "Porto de Pedras",
-  "Porto Real do Colégio",
-  "Quebrangulo",
-  "Rio Largo",
-  "Roteiro",
-  "Santa Luzia do Norte",
-  "Santana do Ipanema",
-  "Santana do Mundaú",
-  "São Brás",
-  "São José da Laje",
-  "São José da Tapera",
-  "São Luís do Quitunde",
-  "São Miguel dos Campos",
-  "São Miguel dos Milagres",
-  "São Sebastião",
-  "Satuba",
-  "Senador Rui Palmeira",
-  "Tanque d'Arca",
-  "Taquarana",
-  "Teotônio Vilela",
-  "Traipu",
-  "União dos Palmares",
-  "Viçosa",
-];
-
-const STATUS_ITEMS = [
-  "Fiel a Ficante",
-  "Solteiro",
-  "Casado",
-  "Divorciado",
-  "Namorando",
-  "Separado",
-  "União Estável",
-  "Nunca namorei, mas observo...",
-  "Último romântico",
-];
+import {
+  CITIES,
+  HOBBIES,
+  JOBS,
+  SINGLE_STATUS_ITEMS,
+  STATUS_ITEMS,
+} from "./data";
+import { Badge } from "./components/ui/badge";
 
 function App() {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [openStatus, setOpenStatus] = useState(false);
   const [openSubStatus, setOpenSubStatus] = useState(false);
+  const [openJobs, setOpenJobs] = useState(false);
+  const [openHoobies, setOpenHobbies] = useState(false);
   const [value, setValue] = useState("");
   const [status, setStatus] = useState("");
+  const [job, setJob] = useState("");
   const [subStatus, setSubStatus] = useState("");
   const [name, setName] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [linkedin, setLinkedin] = useState("");
   const [cities, setCities] = useState<[] | any>([]);
   const [usersStatus, setUsersStatus] = useState<[] | any>([]);
+  const [hobby, setHobby] = useState<[] | any>([]);
 
   const getCities = async () => {
     const { data, error } = await supabase.from("user_city").select("");
@@ -188,21 +86,35 @@ function App() {
       name,
       city: value,
       status,
-      subStatus
+      subStatus,
+      hobby: hobby.join(","),
+      job,
+      instagram,
+      linkedin,
     };
 
-    if(name.length < 2) {
+    if (name.length < 2) {
       return alert("Nome precisa ter mais de 2 caracteres");
     }
 
     if (value === "") {
       return alert("Selecione uma cidade");
     }
+
+    if (job === "") {
+      return alert("Selecione um trabalho");
+    }
+
+    if (hobby.length === 0) {
+      return alert("Selecione um hobby");
+    }
+
     setLoading(true);
 
     const { error } = await supabase.from("user").upsert(data);
 
     if (error) {
+      setLoading(false);
       return alert(error.message);
     }
 
@@ -210,21 +122,27 @@ function App() {
     setName("");
     setValue("");
     setStatus("");
+    setHobby([]);
+    setJob("");
     setLoading(false);
     alert("Cadastrado com sucesso");
   };
 
+  const handleUnselect = (item: string) => {
+    setHobby(hobby.filter((i: string) => i !== item));
+  };
+
   return (
-    <div className="lg:h-screen bg-black flex justify-center items-center gap-8 flex-col p-[24px]">
+    <div className="lg:h-screen bg-black flex justify-center items-center gap-8 flex-col lg:flex-row p-[24px]">
       <Analytics />
       <form onSubmit={onSubmit} className="lg:w-[716px] w-full">
-        <Card className="lg:w-[716px] w-full">
+        <Card className="lg:w-[716px] w-full h-[683px]">
           <CardHeader>
             <CardTitle>Censo RD AL 🎈</CardTitle>
-            <CardDescription>De onde você é ?</CardDescription>
+            <CardDescription>IBGE DO RD ?</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid w-full items-center gap-4">
+            <div className="grid w-full items-center gap-4  ">
               <div className="flex flex-col space-y-1.5 w-[300px]">
                 <Label htmlFor="name">Nome</Label>
                 <Input
@@ -234,6 +152,28 @@ function App() {
                   min={2}
                   required
                   onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5 w-[300px]">
+                <Label htmlFor="name">Qual o seu Instagram: </Label>
+                <Input
+                  id="instagram"
+                  placeholder="Seu Instagram"
+                  value={instagram}
+                  min={2}
+                  required
+                  onChange={(e) => setInstagram(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5 w-[300px]">
+                <Label htmlFor="name">Qual o seu Linkedin: </Label>
+                <Input
+                  id="linkedin"
+                  placeholder="Seu linkedin"
+                  value={linkedin}
+                  min={2}
+                  required
+                  onChange={(e) => setLinkedin(e.target.value)}
                 />
               </div>
               <div className="flex flex-col space-y-1.5">
@@ -255,7 +195,7 @@ function App() {
                   <PopoverContent className="w-full p-0">
                     <Command>
                       <CommandInput
-                        placeholder="Search framework..."
+                        placeholder="Qual a sua cidade..."
                         className="h-9 w-[250px]"
                         required
                       />
@@ -307,7 +247,7 @@ function App() {
                   <PopoverContent className="w-full p-0">
                     <Command>
                       <CommandInput
-                        placeholder="Qual o seu St..."
+                        placeholder="Qual o seu Estado Cívil..."
                         className="h-9 w-[250px]"
                         required
                       />
@@ -340,48 +280,104 @@ function App() {
                   </PopoverContent>
                 </Popover>
               </div>
-              {status === "Solteiro" &&<div className="flex flex-col space-y-1.5">
-                <Label htmlFor="name">Qual o nível de Solteiro?:</Label>
-                <Popover open={openSubStatus} onOpenChange={setOpenSubStatus}>
+              {status === "Solteiro" && (
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="name">Qual o nível de Solteiro?:</Label>
+                  <Popover open={openSubStatus} onOpenChange={setOpenSubStatus}>
+                    <PopoverTrigger asChild className="w-full">
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={openSubStatus}
+                        className="w-[300px] justify-between"
+                      >
+                        {subStatus
+                          ? SINGLE_STATUS_ITEMS.find((i) => i === subStatus)
+                          : "Selecione o seu nível de Solteiro..."}
+                        <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput
+                          placeholder="Qual o nível de Solteiro..."
+                          className="h-9 w-[250px]"
+                          required
+                        />
+                        <CommandList>
+                          <CommandEmpty>.</CommandEmpty>
+                          <CommandGroup>
+                            {SINGLE_STATUS_ITEMS.map((i) => (
+                              <CommandItem
+                                key={i}
+                                value={i}
+                                onSelect={(currentValue) => {
+                                  setSubStatus(
+                                    currentValue === subStatus
+                                      ? ""
+                                      : currentValue
+                                  );
+                                  setOpenSubStatus(false);
+                                }}
+                              >
+                                {i}
+                                <CheckIcon
+                                  className={cn(
+                                    "ml-auto h-4 w-4",
+                                    status === i ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              )}
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="name">Você trabalha com o que?:</Label>
+                <Popover open={openJobs} onOpenChange={setOpenJobs}>
                   <PopoverTrigger asChild className="w-full">
                     <Button
                       variant="outline"
                       role="combobox"
-                      aria-expanded={openSubStatus}
+                      aria-expanded={openJobs}
                       className="w-[300px] justify-between"
                     >
-                      {subStatus
-                        ? ['Emocionado', 'Humilhado', 'Encalhado', 'Pra titia', 'Desiludido', 'Oi, vi que você apagou as fotos com o seu EX tá tudo bem?', 'Só solteiro mesmo', 'Golpe'].find((i) => i === subStatus)
-                        : "Selecione o seu nível de Solteiro..."}
+                      {job
+                        ? JOBS.find((i) => i === job)
+                        : "Selecione o seu trabalho..."}
                       <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-full p-0">
                     <Command>
                       <CommandInput
-                        placeholder="Qual o nível de Solteiro..."
+                        placeholder="Qual o seu Job..."
                         className="h-9 w-[250px]"
                         required
                       />
                       <CommandList>
-                        <CommandEmpty>.</CommandEmpty>
+                        <CommandEmpty>No job found.</CommandEmpty>
                         <CommandGroup>
-                          {['Emocionado', 'Humilhado', 'Encalhado', 'Pra titia', 'Desiludido', 'Oi, vi que você apagou as fotos com o seu EX tá tudo bem?', 'Só solteiro mesmo', 'Golpe'].map((i) => (
+                          {JOBS.map((i) => (
                             <CommandItem
                               key={i}
                               value={i}
                               onSelect={(currentValue) => {
-                                setSubStatus(
-                                  currentValue === subStatus ? "" : currentValue
+                                setJob(
+                                  currentValue === job ? "" : currentValue
                                 );
-                                setOpenSubStatus(false);
+                                setOpenJobs(false);
                               }}
                             >
                               {i}
                               <CheckIcon
                                 className={cn(
                                   "ml-auto h-4 w-4",
-                                  status === i ? "opacity-100" : "opacity-0"
+                                  job === i ? "opacity-100" : "opacity-0"
                                 )}
                               />
                             </CommandItem>
@@ -391,15 +387,103 @@ function App() {
                     </Command>
                   </PopoverContent>
                 </Popover>
-              </div>}
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="name">Qual os seus Hobbies:</Label>
+                <Popover open={openHoobies} onOpenChange={setOpenHobbies}>
+                  <PopoverTrigger asChild className="w-full">
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openJobs}
+                      className={`w-[300px] justify-between ${
+                        hobby.length > 1 ? "h-full" : "h-10"
+                      }`}
+                    >
+                      <div className="flex gap-1 flex-wrap">
+                        {hobby.length > 0
+                          ? hobby.map((item: string) => (
+                              <Badge
+                                variant="secondary"
+                                key={item}
+                                className="mr-1 mb-1"
+                                onClick={() => handleUnselect(item)}
+                              >
+                                {item}
+                                <button
+                                  className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                      handleUnselect(item);
+                                    }
+                                  }}
+                                  onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                  }}
+                                  onClick={() => handleUnselect(item)}
+                                >
+                                  <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                                </button>
+                              </Badge>
+                            ))
+                          : "Selecione os seus hobbies..."}
+                      </div>
+                      <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput
+                        placeholder="Qual o seu hobby..."
+                        className="h-9 w-[250px]"
+                        required
+                      />
+                      <CommandGroup>
+                        <CommandList>
+                          {HOBBIES.map((option) => (
+                            <CommandItem
+                              key={option}
+                              value={option}
+                              onSelect={() => {
+                                setHobby(
+                                  hobby.includes(option)
+                                    ? hobby.filter(
+                                        (item: string) => item !== option
+                                      )
+                                    : [...hobby, option]
+                                );
+
+                                setOpen(false);
+                              }}
+                            >
+                              <CheckIcon
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  hobby.includes(option)
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              {option}
+                            </CommandItem>
+                          ))}
+                        </CommandList>
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </CardContent>
           <CardFooter className="flex justify-end">
-            <Button disabled={loading} type="submit">{loading ? 'loading...' : 'Enviar'}</Button>
+            <Button disabled={loading} type="submit">
+              {loading ? "loading..." : "Enviar"}
+            </Button>
           </CardFooter>
         </Card>
       </form>
-      <div className="flex flex-row gap-4">
+      <div className="flex gap-4 flex-col w-full lg:w-[350px]">
         <Card className="lg:w-[350px] w-full">
           <CardHeader>
             <CardTitle>Cidades 🎈</CardTitle>
