@@ -133,16 +133,16 @@ function App() {
   };
 
   return (
-    <div className="lg:h-screen bg-black flex justify-center items-center gap-8 flex-col lg:flex-row p-[24px]">
+    <div className="lg:h-full min-h-screen bg-black flex justify-center items-center gap-8 flex-col lg:flex-row p-[24px]">
       <Analytics />
       <form onSubmit={onSubmit} className="lg:w-[716px] w-full">
-        <Card className="lg:w-[716px] w-full h-[740px] relative">
+        <Card className="lg:w-[716px] w-full min-h-[740px] h-full relative">
           <CardHeader>
             <CardTitle>Censo RD AL 🎈</CardTitle>
             <CardDescription>IBGE DO RD ?</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid w-full items-center gap-4  ">
+          <CardContent className="">
+            <div className="grid w-full items-center gap-4 pb-[72px]">
               <div className="flex flex-col space-y-1.5 w-[300px]">
                 <Label htmlFor="name">Nome</Label>
                 <Input
