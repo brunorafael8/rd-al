@@ -45,6 +45,7 @@ import {
   STATUS_ITEMS,
 } from "../services/data";
 import { supabase } from "../supabaseClient";
+import { LoadingSpinner } from "@/components/LoadingSpiner";
 
 function Census() {
   const [loading, setLoading] = useState(false);
@@ -200,7 +201,9 @@ function Census() {
                         required
                       />
                       <CommandList>
-                        <CommandEmpty>No framework found.</CommandEmpty>
+                        <CommandEmpty>
+                          Nenhum resultado encontrado.
+                        </CommandEmpty>
                         <CommandGroup>
                           {CITIES.map((city) => (
                             <CommandItem
@@ -252,7 +255,9 @@ function Census() {
                         required
                       />
                       <CommandList>
-                        <CommandEmpty>No framework found.</CommandEmpty>
+                        <CommandEmpty>
+                          Nenhum resultado encontrado.
+                        </CommandEmpty>
                         <CommandGroup>
                           {STATUS_ITEMS.map((i) => (
                             <CommandItem
@@ -498,12 +503,18 @@ function Census() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {cities.map((item: any) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-bold">{item.city}</TableCell>
-                    <TableCell>{item.total}</TableCell>
-                  </TableRow>
-                ))}
+                {cities.length > 0 ? (
+                  cities.map((item: any) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-bold">{item.city}</TableCell>
+                      <TableCell>{item.total}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <div className="text-center justify-center flex items-center w-full h-[900px]">
+                    <LoadingSpinner className="text-white h-10 w-10" />
+                  </div>
+                )}
               </TableBody>
             </Table>
           </CardContent>
@@ -522,12 +533,18 @@ function Census() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {usersStatus.map((item: any) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-bold">{item.status}</TableCell>
-                    <TableCell>{item.total}</TableCell>
-                  </TableRow>
-                ))}
+                {usersStatus.length > 0 ? (
+                  usersStatus.map((item: any) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-bold">{item.status}</TableCell>
+                      <TableCell>{item.total}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <div className="text-center justify-center flex items-center w-full h-[900px]">
+                    <LoadingSpinner className="text-white h-10 w-10" />
+                  </div>
+                )}
               </TableBody>
             </Table>
           </CardContent>
