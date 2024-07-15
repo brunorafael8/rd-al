@@ -20,7 +20,10 @@ function App() {
       <div className="bg-background max-w-[1440px] self-center w-full">
         <div className="flex items-center justify-between h-full space-y-8 p-8 pb-0">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">
+            <h2
+              className="text-2xl font-bold tracking-tight cursor-pointer"
+              onClick={() => router.navigate("/")}
+            >
               Bem Vindo, RD AL!
             </h2>
             <p className="text-muted-foreground">
