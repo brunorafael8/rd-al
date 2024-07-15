@@ -134,7 +134,7 @@ function Census() {
   };
 
   return (
-    <div className="lg:h-full min-h-screen flex justify-center items-center gap-8 flex-col p-[24px]">
+    <div className="lg:h-full min-h-screen flex justify-center items-center gap-8 flex-col px-[24px]">
       <Analytics />
       <form onSubmit={onSubmit} className="lg:w-[716px] w-full py-[32px]">
         <Card className="lg:w-[716px] w-full min-h-[740px] h-full relative">
