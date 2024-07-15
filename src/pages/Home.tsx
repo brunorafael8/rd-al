@@ -21,15 +21,46 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { LinkedInLogoIcon, InstagramLogoIcon } from "@radix-ui/react-icons";
 import "../global.css";
 import { Card } from "@/components/ui/card";
+import { supabase } from "@/supabaseClient";
+import { DataTablePagination } from "@/components/data-table-pagination";
 
 // import { DataTableToolbar } from "./data-table-toolbar"
+const getInstagram = (value: string) => {
+  if (
+    value.includes("https://www.instagram.com/") &&
+    !value.includes("https://instagram.com/@")
+  ) {
+    return value.replace("https://www.instagram.com/", "");
+  }
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
+  if (value.includes("https://instagram.com/@")) {
+    return value.replace("https://instagram.com/@", "");
+  }
+
+  if (value.includes("@")) {
+    return value.replace("@", "");
+  }
+
+  return value;
+};
+
+const getLinkedin = (value: string) => {
+  if (
+    value.includes("https://www.linkedin.com/") &&
+    !value.includes("https://www.linkedin.com/in/")
+  ) {
+    return value.replace("https://www.linkedin.com/", "");
+  }
+
+  if (value.includes("https://www.linkedin.com/in/")) {
+    return value.replace("https://www.linkedin.com/in/", "");
+  }
+
+  return value;
+};
 
 const DataTableColumnHeader = ({ column, title }) => {
   return (
@@ -41,86 +72,63 @@ const DataTableColumnHeader = ({ column, title }) => {
 
 export const columns = [
   {
-    accessorKey: "id",
+    accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Task" />
+      <DataTableColumnHeader column={column} title="Nome" />
     ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
+    cell: ({ row }) => <div className="w-[200px]">{row.getValue("name")}</div>,
     enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: "title",
+    accessorKey: "job",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Title" />
+      <DataTableColumnHeader column={column} title="Job" />
     ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("tit")}</div>,
+    cell: ({ row }) => <div className="w-[80px]">{row.getValue("job")}</div>,
   },
   {
-    accessorKey: "status",
+    accessorKey: "instagram",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
-    ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("status")}</div>,
-
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "priority",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Priority" />
+      <DataTableColumnHeader column={column} title="instagram" />
     ),
     cell: ({ row }) => (
-      <div className="w-[80px]">{row.getValue("priority")}</div>
+      <div className="w-[20px] flex items-center justify-center">
+        <a
+          href={`https://instagram.com/${getInstagram(
+            row.getValue("instagram")
+          )}`}
+        >
+          <InstagramLogoIcon className="h-8 w-8" />
+        </a>
+      </div>
     ),
 
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
   },
-];
+  {
+    accessorKey: "linkedin",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="linkedin" />
+    ),
+    cell: ({ row }) => (
+      <div className="w-[20px]">
+        <a
+          href={`https://www.linkedin.com/in/${getLinkedin(
+            row.getValue("linkedin")
+          )}`}
+          target="_blank"
+        >
+          <LinkedInLogoIcon className="h-8 w-8" />
+        </a>
+      </div>
+    ),
 
-const DATA_TABLE = [
-  {
-    id: "TASK-8782",
-    title:
-      "You can't compress the program without quantifying the open-source SSD pixel!",
-    status: "in progress",
-    label: "documentation",
-    priority: "medium",
-  },
-  {
-    id: "TASK-7878",
-    title:
-      "Try to calculate the EXE feed, maybe it will index the multi-byte pixel!",
-    status: "backlog",
-    label: "documentation",
-    priority: "medium",
-  },
-  {
-    id: "TASK-7839",
-    title: "We need to bypass the neural TCP card!",
-    status: "todo",
-    label: "bug",
-    priority: "high",
-  },
-  {
-    id: "TASK-5562",
-    title:
-      "The SAS interface is down, bypass the open-source pixel so we can back up the PNG bandwidth!",
-    status: "backlog",
-    label: "feature",
-    priority: "medium",
-  },
-  {
-    id: "TASK-8686",
-    title:
-      "I'll parse the wireless SSL protocol, that should driver the API panel!",
-    status: "canceled",
-    label: "feature",
-    priority: "medium",
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
   },
 ];
 
@@ -132,15 +140,37 @@ function Home() {
     []
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [users, setUsers] = React.useState<SortingState>([]);
+
+  const getCities = async () => {
+    const { data, error } = await supabase.from("user").select("*").limit(100);
+    console.log(users);
+
+    if (error && !data) {
+      return alert(error.message);
+    }
+
+    setUsers(data.sort(() => Math.random() - 0.5));
+  };
+
+  React.useEffect(() => {
+    getCities();
+  }, []);
 
   const table = useReactTable({
-    data: DATA_TABLE,
+    data: users,
     columns,
     state: {
       sorting,
       columnVisibility,
       rowSelection,
       columnFilters,
+    },
+    initialState: {
+      pagination: {
+        pageIndex: 2,
+        pageSize: 10, //custom default page size
+      },
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -156,9 +186,9 @@ function Home() {
   });
 
   return (
-    <div className="space-y-4 h-full">
+    <div className="space-y-4 h-full p-8">
       {/* <DataTableToolbar table={table} /> */}
-      <Card className="w-1/2">
+      <Card className="w-2/3">
         <div className="rounded-md border">
           <Table>
             <TableHeader>
@@ -185,6 +215,7 @@ function Home() {
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
+                    className="h-[75px]"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
@@ -209,6 +240,7 @@ function Home() {
             </TableBody>
           </Table>
         </div>
+        <DataTablePagination table={table} />
       </Card>
     </div>
   );
