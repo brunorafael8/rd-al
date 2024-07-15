@@ -1,6 +1,5 @@
 import * as React from "react";
 import {
-  ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
@@ -62,7 +61,12 @@ const getLinkedin = (value: string) => {
   return value;
 };
 
-const DataTableColumnHeader = ({ column, title }) => {
+type DataTableColumnHeaderProps = {
+  column: any;
+  title: string;
+};
+
+const DataTableColumnHeader = ({ title }: DataTableColumnHeaderProps) => {
   return (
     <div className="flex items-center justify-between">
       <span>{title}</span>
@@ -73,26 +77,30 @@ const DataTableColumnHeader = ({ column, title }) => {
 export const columns = [
   {
     accessorKey: "name",
-    header: ({ column }) => (
+    header: ({ column }: { column: any }) => (
       <DataTableColumnHeader column={column} title="Nome" />
     ),
-    cell: ({ row }) => <div className="w-[200px]">{row.getValue("name")}</div>,
+    cell: ({ row }: { row: any }) => (
+      <div className="w-[200px]">{row.getValue("name")}</div>
+    ),
     enableSorting: false,
     enableHiding: false,
   },
   {
     accessorKey: "job",
-    header: ({ column }) => (
+    header: ({ column }: { column: any }) => (
       <DataTableColumnHeader column={column} title="Job" />
     ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("job")}</div>,
+    cell: ({ row }: { row: any }) => (
+      <div className="w-[80px]">{row.getValue("job")}</div>
+    ),
   },
   {
     accessorKey: "instagram",
-    header: ({ column }) => (
+    header: ({ column }: { column: any }) => (
       <DataTableColumnHeader column={column} title="instagram" />
     ),
-    cell: ({ row }) => (
+    cell: ({ row }: { row: any }) => (
       <div className="w-[20px] flex items-center justify-center">
         <a
           href={`https://instagram.com/${getInstagram(
@@ -104,16 +112,20 @@ export const columns = [
       </div>
     ),
 
-    filterFn: (row, id, value) => {
+    filterFn: (
+      row: { getValue: (arg0: any) => any },
+      id: any,
+      value: string | any[]
+    ) => {
       return value.includes(row.getValue(id));
     },
   },
   {
     accessorKey: "linkedin",
-    header: ({ column }) => (
+    header: ({ column }: { column: any }) => (
       <DataTableColumnHeader column={column} title="linkedin" />
     ),
-    cell: ({ row }) => (
+    cell: ({ row }: { row: any }) => (
       <div className="w-[20px]">
         <a
           href={`https://www.linkedin.com/in/${getLinkedin(
@@ -126,7 +138,11 @@ export const columns = [
       </div>
     ),
 
-    filterFn: (row, id, value) => {
+    filterFn: (
+      row: { getValue: (arg0: any) => any },
+      id: any,
+      value: string | any[]
+    ) => {
       return value.includes(row.getValue(id));
     },
   },
