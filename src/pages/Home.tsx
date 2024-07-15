@@ -21,10 +21,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { LinkedInLogoIcon, InstagramLogoIcon } from "@radix-ui/react-icons";
-import "../global.css";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/supabaseClient";
 import { DataTablePagination } from "@/components/data-table-pagination";
+import { DataTableToolbar } from "@/components/data-table-toolbar";
+import "../global.css";
+import NextEventIMG from "../assets/next_event.jpg";
+import { LoadingSpinner } from "@/components/LoadingSpiner";
 
 // import { DataTableToolbar } from "./data-table-toolbar"
 const getInstagram = (value: string) => {
@@ -182,12 +185,6 @@ function Home() {
       rowSelection,
       columnFilters,
     },
-    initialState: {
-      pagination: {
-        pageIndex: 2,
-        pageSize: 10, //custom default page size
-      },
-    },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -202,61 +199,73 @@ function Home() {
   });
 
   return (
-    <div className="space-y-4 h-full p-8">
-      {/* <DataTableToolbar table={table} /> */}
-      <Card className="w-2/3">
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id} colSpan={header.colSpan}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="h-[75px]"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
+    <div className="h-full p-8 flex items-start justify-between flex-flow lg:flex-row flex-col">
+      <div className="lg:w-2/3 w-full space-y-4 mr-4">
+        <DataTableToolbar table={table} />
+        <Card className="mt-4">
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id} colSpan={header.colSpan}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      );
+                    })}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <DataTablePagination table={table} />
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                      className="h-[75px]"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="text-center h-[750px]"
+                    >
+                      <div className="text-center justify-center flex items-center">
+                        <LoadingSpinner className="text-white h-10 w-10" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <DataTablePagination table={table} />
+        </Card>
+      </div>
+      <Card className="h-full relative mt-[64px] lg:w-1/3 w-full min-[454px]">
+        <CardHeader>
+          <CardTitle>Próximo Evento🎈</CardTitle>
+        </CardHeader>
+        <CardContent className="">
+          <img src={NextEventIMG} alt="next-event" />
+        </CardContent>
       </Card>
     </div>
   );
