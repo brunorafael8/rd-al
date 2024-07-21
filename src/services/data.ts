@@ -278,7 +278,6 @@ export const JOBS = [
   "Empresário",
   "Examinador de Trânsito",
   "Físico",
-  "Fonoaudiólogo",
   "Garimpeiro",
   "Gastrônomo",
   "Genealogista",
