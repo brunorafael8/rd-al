@@ -40,19 +40,18 @@ import { X } from "lucide-react";
 import {
   CITIES,
   HOBBIES,
-  JOBS,
   SINGLE_STATUS_ITEMS,
   STATUS_ITEMS,
 } from "../services/data";
 import { supabase } from "../supabaseClient";
 import { LoadingSpinner } from "@/components/LoadingSpiner";
+import { PopoverJobs } from "@/components/PopoverJobs";
 
 function Census() {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [openStatus, setOpenStatus] = useState(false);
   const [openSubStatus, setOpenSubStatus] = useState(false);
-  const [openJobs, setOpenJobs] = useState(false);
   const [openHoobies, setOpenHobbies] = useState(false);
   const [value, setValue] = useState("");
   const [status, setStatus] = useState("");
@@ -343,55 +342,7 @@ function Census() {
               )}
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Você trabalha com o que?:</Label>
-                <Popover open={openJobs} onOpenChange={setOpenJobs}>
-                  <PopoverTrigger asChild className="w-full">
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={openJobs}
-                      className="w-[300px] justify-between"
-                    >
-                      {job
-                        ? JOBS.find((i) => i === job)
-                        : "Selecione o seu trabalho..."}
-                      <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-full p-0">
-                    <Command>
-                      <CommandInput
-                        placeholder="Qual o seu Job..."
-                        className="h-9 w-[250px]"
-                        required
-                      />
-                      <CommandList>
-                        <CommandEmpty>No job found.</CommandEmpty>
-                        <CommandGroup>
-                          {JOBS.map((i) => (
-                            <CommandItem
-                              key={i}
-                              value={i}
-                              onSelect={(currentValue) => {
-                                setJob(
-                                  currentValue === job ? "" : currentValue
-                                );
-                                setOpenJobs(false);
-                              }}
-                            >
-                              {i}
-                              <CheckIcon
-                                className={cn(
-                                  "ml-auto h-4 w-4",
-                                  job === i ? "opacity-100" : "opacity-0"
-                                )}
-                              />
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <PopoverJobs onJobSelected={setJob} />
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="name">Qual os seus Hobbies:</Label>
@@ -400,7 +351,7 @@ function Census() {
                     <Button
                       variant="outline"
                       role="combobox"
-                      aria-expanded={openJobs}
+                      aria-expanded={openHoobies}
                       className={`w-[300px] justify-between ${
                         hobby.length > 1 ? "h-full" : "h-10"
                       }`}
